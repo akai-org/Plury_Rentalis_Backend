@@ -1,5 +1,6 @@
 package pl.org.akai.plury_rentalis_backend.register;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ public class RegisterController {
     private UserRepository userRepo;
 
     @PostMapping
-    ResponseEntity<?> registerNewUser(@RequestBody VerifyDTO verifyDTO) {
+    ResponseEntity<?> registerNewUser(@NotNull @RequestBody VerifyDTO verifyDTO) {
         if (userRepo.existsByEmail(verifyDTO.getEmail())) {
             return ResponseEntity.badRequest().body("User already exists");
         }
