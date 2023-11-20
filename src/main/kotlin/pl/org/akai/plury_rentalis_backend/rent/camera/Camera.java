@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.rentables.camera;
+package pl.org.akai.plury_rentalis_backend.rent.camera;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
 
 @Entity
 @Setter
@@ -24,5 +22,4 @@ public class Camera {
     private String name;
 
     private String imageName;
-    //todo add content specific parameters
 }

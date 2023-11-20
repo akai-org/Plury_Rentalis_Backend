@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.rentables.camera;
+package pl.org.akai.plury_rentalis_backend.rent.camera;
 
 import org.springframework.data.repository.CrudRepository;
 
