@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.rentables;
+package pl.org.akai.plury_rentalis_backend.rent;
 
 import java.util.Map;
 
@@ -8,5 +8,7 @@ public interface Rentable<T> {
 
     T getId();
 
-    byte[] getImage();
+    RentableType getType();
+
+    String getImageURL();
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.org.akai.plury_rentalis_backend.verify.UserRepository;
-import pl.org.akai.plury_rentalis_backend.verify.VDTOToUser;
+import pl.org.akai.plury_rentalis_backend.verify.VerifyDTOUserTranslator;
 import pl.org.akai.plury_rentalis_backend.verify.VerifyDTO;
 
 @RestController
@@ -24,7 +24,7 @@ public class RegisterController {
         }
 
         try {
-            var user = VDTOToUser.toUser(verifyDTO);
+            var user = VerifyDTOUserTranslator.toUser(verifyDTO);
             userRepo.save(user);
             return ResponseEntity.ok().body(user);
         } catch (NullPointerException nullPointerException) {
