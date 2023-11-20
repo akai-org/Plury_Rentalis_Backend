@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.rentables.car;
+package pl.org.akai.plury_rentalis_backend.rent.car;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -26,5 +28,4 @@ public class Car {
     private String name;
 
     private String imageName;
-    //todo add content specific parameters
 }
