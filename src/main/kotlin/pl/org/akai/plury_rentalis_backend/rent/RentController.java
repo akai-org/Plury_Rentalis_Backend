@@ -12,6 +12,7 @@ import pl.org.akai.plury_rentalis_backend.rent.camera.VerifiableCamera;
 import pl.org.akai.plury_rentalis_backend.rent.car.CarRepository;
 import pl.org.akai.plury_rentalis_backend.rent.car.VerifiableCar;
 import pl.org.akai.plury_rentalis_backend.verify.UnknownUserException;
+import pl.org.akai.plury_rentalis_backend.verify.User;
 import pl.org.akai.plury_rentalis_backend.verify.VerifyService;
 
 import java.time.LocalDate;
@@ -63,8 +64,10 @@ public class RentController {
         if (!cameraRepository.existsByIdAndName(camera.getId(), camera.getName()))
             throw new RentableNotFoundException("Unknown camera");
 
+        User currentUser = verifyService.findByEmail(camera.getEmail());
         RentData rentData = RentData.builder()
                 .rentedId(camera.getId())
+                .renterId(currentUser.getId())
                 .rentDate(LocalDate.now())
                 .type(RentableType.CAMERA)
                 .build();
