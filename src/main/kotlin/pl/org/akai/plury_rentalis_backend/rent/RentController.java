@@ -1,7 +1,6 @@
 package pl.org.akai.plury_rentalis_backend.rent;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,7 +78,7 @@ public class RentController {
             UnknownUserException.class,
             RentableNotFoundException.class
     })
-    public ResponseEntity<?> handleNotFoundException(RuntimeException ex) {
+    public ResponseEntity<?> handleNotFoundException(RuntimeException ignored) {
         return ResponseEntity.notFound().build();
     }
 

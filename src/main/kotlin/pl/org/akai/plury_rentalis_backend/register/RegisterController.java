@@ -32,7 +32,7 @@ public class RegisterController {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<?> carryException(NullPointerException ex) {
+    public ResponseEntity<?> carryException(NullPointerException ignored) {
         return ResponseEntity.badRequest().body("Email cannot be null");
     }
 }

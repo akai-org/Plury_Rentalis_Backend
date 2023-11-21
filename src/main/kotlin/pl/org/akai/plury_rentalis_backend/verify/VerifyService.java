@@ -1,6 +1,5 @@
 package pl.org.akai.plury_rentalis_backend.verify;
 
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
