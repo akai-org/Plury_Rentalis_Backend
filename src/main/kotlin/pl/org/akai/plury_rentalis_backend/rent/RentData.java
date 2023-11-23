@@ -28,6 +28,8 @@ public class RentData {
 
     private Long rentedId;
 
+    private Long renterId;
+
     @Enumerated(EnumType.STRING)
     private RentableType type;
 
