@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.org.akai.plury_rentalis_backend.rent.camera.Camera;
 import pl.org.akai.plury_rentalis_backend.rent.camera.CameraRepository;
-import pl.org.akai.plury_rentalis_backend.rent.camera.VerifiableCamera;
+import pl.org.akai.plury_rentalis_backend.rent.car.Car;
 import pl.org.akai.plury_rentalis_backend.rent.car.CarRepository;
-import pl.org.akai.plury_rentalis_backend.rent.car.VerifiableCar;
 import pl.org.akai.plury_rentalis_backend.verify.UnknownUserException;
 import pl.org.akai.plury_rentalis_backend.verify.User;
+import pl.org.akai.plury_rentalis_backend.verify.Verify;
 import pl.org.akai.plury_rentalis_backend.verify.VerifyService;
 
 import java.time.LocalDate;
@@ -30,23 +31,17 @@ public class RentController {
     private final VerifyService verifyService;
 
 
-//    public RentController(CarRepository carRepository, CameraRepository cameraRepository, RentedDataRepository rentedDataRepository, VerifyService verifyService) {
-//        this.carRepository = carRepository;
-//        this.cameraRepository = cameraRepository;
-//        this.rentedDataRepository = rentedDataRepository;
-//        this.verifyService = verifyService;
-//    }
 
     @PostMapping("/car")
-    public ResponseEntity<?> rentCar(@RequestBody VerifiableCar car) {
+    public ResponseEntity<?> rentCar(@RequestBody Verify<Car> car) {
         if (!verifyService.verify(car))
             throw new UnknownUserException("User: " + car.getEmail() + " not found");
 
-        if (!carRepository.existsByIdAndName(car.getId(), car.getName()))
+        if (!carRepository.existsByIdAndName(car.getBody().getId(), car.getBody().getName()))
             throw new RentableNotFoundException("Unknown car");
 
         RentData rentData = RentData.builder()
-                .rentedId(car.getId())
+                .rentedId(car.getBody().getId())
                 .rentDate(LocalDate.now())
                 .type(RentableType.CAR)
                 .build();
@@ -57,16 +52,16 @@ public class RentController {
     }
 
     @PostMapping("/camera")
-    public ResponseEntity<?> rentCamera(@RequestBody VerifiableCamera camera) {
+    public ResponseEntity<?> rentCamera(@RequestBody Verify<Camera> camera) {
         if (!verifyService.verify(camera))
             throw new UnknownUserException("User: " + camera.getEmail() + " not found");
 
-        if (!cameraRepository.existsByIdAndName(camera.getId(), camera.getName()))
+        if (!cameraRepository.existsByIdAndName(camera.getBody().getId(), camera.getBody().getName()))
             throw new RentableNotFoundException("Unknown camera");
 
         User currentUser = verifyService.findByEmail(camera.getEmail());
         RentData rentData = RentData.builder()
-                .rentedId(camera.getId())
+                .rentedId(camera.getBody().getId())
                 .renterId(currentUser.getId())
                 .rentDate(LocalDate.now())
                 .type(RentableType.CAMERA)
