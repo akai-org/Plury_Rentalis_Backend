@@ -1,34 +1,22 @@
 package pl.org.akai.plury_rentalis_backend.register;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.org.akai.plury_rentalis_backend.verify.UserRepository;
-import pl.org.akai.plury_rentalis_backend.verify.VDTOToUser;
-import pl.org.akai.plury_rentalis_backend.verify.VerifyDTO;
+import pl.org.akai.plury_rentalis_backend.verify.VerifiableRent;
 
 @RestController
 @RequestMapping("/register")
+@AllArgsConstructor
 public class RegisterController {
-    @Autowired
-    private UserRepository userRepo;
+    private RegisterService registerService;
 
     @PostMapping
-    ResponseEntity<?> registerNewUser(@RequestBody VerifyDTO verifyDTO) {
-        if (userRepo.existsByEmail(verifyDTO.getEmail())) {
-            return ResponseEntity.badRequest().body("User already exists");
-        }
-
-        try {
-            var user = VDTOToUser.toUser(verifyDTO);
-            userRepo.save(user);
-            return ResponseEntity.ok().body(user);
-        } catch (NullPointerException nullPointerException) {
-            return ResponseEntity.badRequest().body("Email cannot be null");
-        }
+    ResponseEntity<?> registerNewUser(@RequestBody VerifiableRent<?> verifiable) {
+        return registerService.registerNewUser(verifiable);
     }
 
 }
