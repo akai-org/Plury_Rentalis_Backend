@@ -2,87 +2,82 @@ package pl.org.akai.plury_rentalis_backend.rent;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pl.org.akai.plury_rentalis_backend.rent.camera.CameraRepository;
-import pl.org.akai.plury_rentalis_backend.rent.camera.VerifiableCamera;
-import pl.org.akai.plury_rentalis_backend.rent.car.CarRepository;
-import pl.org.akai.plury_rentalis_backend.rent.car.VerifiableCar;
-import pl.org.akai.plury_rentalis_backend.verify.UnknownUserException;
-import pl.org.akai.plury_rentalis_backend.verify.User;
-import pl.org.akai.plury_rentalis_backend.verify.VerifyService;
+import pl.org.akai.plury_rentalis_backend.register.RegisterService;
+import pl.org.akai.plury_rentalis_backend.rentable.RentableObject;
+import pl.org.akai.plury_rentalis_backend.rentable.RentableRepository;
+import pl.org.akai.plury_rentalis_backend.verify.VerifiableRent;
 
 import java.time.LocalDate;
+import java.util.stream.StreamSupport;
 
-@RestController
-@RequestMapping("/rent")
+@Controller
+@RequestMapping("rent")
 @AllArgsConstructor
 public class RentController {
-    private final CarRepository carRepository;
+    private RentableRepository rentableRepository;
+    private RentRepository rentRepository;
+    private RegisterService registerService;
 
-    private final CameraRepository cameraRepository;
-
-    private final RentedDataRepository rentedDataRepository;
-
-    private final VerifyService verifyService;
-
-
-//    public RentController(CarRepository carRepository, CameraRepository cameraRepository, RentedDataRepository rentedDataRepository, VerifyService verifyService) {
-//        this.carRepository = carRepository;
-//        this.cameraRepository = cameraRepository;
-//        this.rentedDataRepository = rentedDataRepository;
-//        this.verifyService = verifyService;
-//    }
-
-    @PostMapping("/car")
-    public ResponseEntity<?> rentCar(@RequestBody VerifiableCar car) {
-        if (!verifyService.verify(car))
-            throw new UnknownUserException("User: " + car.getEmail() + " not found");
-
-        if (!carRepository.existsByIdAndName(car.getId(), car.getName()))
-            throw new RentableNotFoundException("Unknown car");
-
-        RentData rentData = RentData.builder()
-                .rentedId(car.getId())
-                .rentDate(LocalDate.now())
-                .type(RentableType.CAR)
-                .build();
-
-        rentedDataRepository.save(rentData);
-
-        return ResponseEntity.ok().body(rentData);
+    @GetMapping("all")
+    public ResponseEntity<?> getAll() {
+        return ResponseEntity.ok(rentableRepository.findAll());
     }
 
-    @PostMapping("/camera")
-    public ResponseEntity<?> rentCamera(@RequestBody VerifiableCamera camera) {
-        if (!verifyService.verify(camera))
-            throw new UnknownUserException("User: " + camera.getEmail() + " not found");
-
-        if (!cameraRepository.existsByIdAndName(camera.getId(), camera.getName()))
-            throw new RentableNotFoundException("Unknown camera");
-
-        User currentUser = verifyService.findByEmail(camera.getEmail());
-        RentData rentData = RentData.builder()
-                .rentedId(camera.getId())
-                .renterId(currentUser.getId())
-                .rentDate(LocalDate.now())
-                .type(RentableType.CAMERA)
-                .build();
-
-        rentedDataRepository.save(rentData);
-
-        return ResponseEntity.ok().body(rentData);
+    @GetMapping("rented")
+    public ResponseEntity<?> getRented() {
+        return ResponseEntity.ok(ResponseEntity.ok(
+                StreamSupport.stream(rentRepository.findAllByReturnDateIsEmpty().spliterator(), false)
+                .map(Rent::getRentable)));
     }
 
-    @ExceptionHandler({
-            UnknownUserException.class,
-            RentableNotFoundException.class
-    })
-    public ResponseEntity<?> handleNotFoundException(RuntimeException ignored) {
-        return ResponseEntity.notFound().build();
+    @PostMapping
+    public ResponseEntity<?> rent(@RequestBody VerifiableRent<? extends RentableObject> rentRequest) {
+        if (!registerService.isVerified(rentRequest)) {
+            return ResponseEntity.badRequest().body("Unknown user");
+        }
+
+        var activeRent = StreamSupport.stream(rentRepository.findAll().spliterator(), false)
+                .filter(it -> it.getReturnDate() == null)
+                .filter(it -> it.getRentable().getId().equals(rentRequest.getBody().getId()))
+                .findAny();
+
+        if (activeRent.isPresent())
+            return ResponseEntity.badRequest().body("Given object is already rented");
+
+        Rent rent = Rent
+                .builder()
+                .rentDate(LocalDate.now())
+                .renter(registerService.getUser(rentRequest.getEmail()))
+                .rentable(rentRequest.getBody())
+                .build();
+
+        rentRepository.save(rent);
+
+        return ResponseEntity.ok(rent);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> giveBack(@RequestBody VerifiableRent<Long> giveBackRequest) {
+        if (!registerService.isVerified(giveBackRequest))
+            return ResponseEntity.badRequest().body("Unknown user");
+
+        var activeRent = rentRepository.findById(giveBackRequest.getBody());
+
+        if (activeRent.isEmpty())
+            return ResponseEntity.badRequest().body("Unknown rent id");
+
+        Rent rent = activeRent.get();
+        rent.setRentDate(LocalDate.now());
+
+        rentRepository.save(rent);
+
+        return ResponseEntity.ok(rent);
     }
 
 
