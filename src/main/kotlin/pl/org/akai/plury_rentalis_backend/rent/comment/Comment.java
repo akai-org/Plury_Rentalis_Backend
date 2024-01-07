@@ -1,18 +1,18 @@
-package pl.org.akai.plury_rentalis_backend.rent;
+package pl.org.akai.plury_rentalis_backend.rent.comment;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import pl.org.akai.plury_rentalis_backend.rentable.RentableObject;
+import pl.org.akai.plury_rentalis_backend.rent.Rent;
 import pl.org.akai.plury_rentalis_backend.verify.User;
 
 import java.time.LocalDate;
@@ -20,25 +20,26 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Setter
 @Getter
-@EqualsAndHashCode
-public class Rent {
+public class Comment {
     @Id
     @GeneratedValue
     private Long id;
 
+    @Setter
     @ManyToOne
-    private User renter;
+    @JoinColumn(name = "rent_id")
+    private Rent rent;
 
+    @DateTimeFormat(pattern="YYYY-mm-DD")
+    private LocalDate date;
+
+    @Column(nullable = false, length = 1000)
+    public String content;
+
+    @Setter
     @ManyToOne
-    private RentableObject rentable;
+    @JoinColumn(name = "author_id")
+    private User author;
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "YYYY-mm-DD")
-    private LocalDate rentDate;
-
-    @DateTimeFormat(pattern = "YYYY-mm-DD")
-    private LocalDate returnDate;
 }

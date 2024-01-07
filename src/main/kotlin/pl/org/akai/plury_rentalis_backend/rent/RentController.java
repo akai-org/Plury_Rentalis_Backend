@@ -14,7 +14,7 @@ import pl.org.akai.plury_rentalis_backend.rentable.RentableRepository;
 import pl.org.akai.plury_rentalis_backend.verify.VerifiableRent;
 
 import java.time.LocalDate;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Controller
 @RequestMapping("rent")
@@ -29,21 +29,26 @@ public class RentController {
         return ResponseEntity.ok(rentableRepository.findAll());
     }
 
+    @GetMapping("rented")
+    public ResponseEntity<?> getRented() {
+        return ResponseEntity.ok(ResponseEntity.ok(
+                StreamSupport.stream(rentRepository.findAllByReturnDateIsEmpty().spliterator(), false)
+                .map(Rent::getRentable)));
+    }
+
     @PostMapping
-    public ResponseEntity<?> rent(@RequestBody VerifiableRent<RentableObject> rentRequest) {
+    public ResponseEntity<?> rent(@RequestBody VerifiableRent<? extends RentableObject> rentRequest) {
         if (!registerService.isVerified(rentRequest)) {
             return ResponseEntity.badRequest().body("Unknown user");
         }
 
-        var iterator = rentRepository.findAll().iterator();
-        var activeRent = Stream.generate(() -> null)
-                .map(n -> iterator.next())
-                .filter(it -> it.getRentable().getId().equals(rentRequest.getBody().getId()))
+        var activeRent = StreamSupport.stream(rentRepository.findAll().spliterator(), false)
                 .filter(it -> it.getReturnDate() == null)
+                .filter(it -> it.getRentable().getId().equals(rentRequest.getBody().getId()))
                 .findAny();
 
         if (activeRent.isPresent())
-            return ResponseEntity.badRequest().body("Unknown user");
+            return ResponseEntity.badRequest().body("Given object is already rented");
 
         Rent rent = Rent
                 .builder()
@@ -74,4 +79,6 @@ public class RentController {
 
         return ResponseEntity.ok(rent);
     }
+
+
 }

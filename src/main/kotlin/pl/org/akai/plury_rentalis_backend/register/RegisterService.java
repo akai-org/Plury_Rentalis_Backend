@@ -30,6 +30,9 @@ public class RegisterService {
     public Boolean isVerified(VerifiableRent<?> verifiable) {
         return userRepo.existsByEmail(verifiable.getEmail());
     }
+    public Boolean isVerified(String email) {
+        return userRepo.existsByEmail(email);
+    }
 
     public User getUser(String email) {
         return userRepo.findByEmail(email);
