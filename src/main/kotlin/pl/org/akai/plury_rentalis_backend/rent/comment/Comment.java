@@ -1,6 +1,5 @@
 package pl.org.akai.plury_rentalis_backend.rent.comment;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
