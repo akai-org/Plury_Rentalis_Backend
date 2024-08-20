@@ -3,6 +3,7 @@ package pl.org.akai.plury_rentalis_backend.rent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -10,24 +11,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.format.annotation.DateTimeFormat;
 import pl.org.akai.plury_rentalis_backend.rentable.RentableObject;
-import pl.org.akai.plury_rentalis_backend.verify.User;
+import pl.org.akai.plury_rentalis_backend.user.User;
 
-import java.time.LocalDate;
-import java.util.Objects;
+import java.time.Instant;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Setter
+@AllArgsConstructor
 @Getter
 public class Rent {
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String uuid;
 
     @ManyToOne
     private User renter;
@@ -35,26 +31,24 @@ public class Rent {
     @ManyToOne
     private RentableObject rentable;
 
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "YYYY-mm-DD")
-    private LocalDate rentDate;
+    @Column
+    private Instant rentDate;
 
-    @DateTimeFormat(pattern = "YYYY-mm-DD")
-    private LocalDate returnDate;
+    @Column
+    @Setter
+    private Instant returnDate;
 
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        Rent rent = (Rent) o;
-        return getId() != null && Objects.equals(getId(), rent.getId());
+    @Builder(builderMethodName = "builderWithRentDate")
+    public Rent(User renter, RentableObject rentable, Instant rentDate) {
+        this.renter = renter;
+        this.rentable = rentable;
+        this.rentDate = rentDate;
     }
 
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    @Builder
+    public Rent(User renter, RentableObject rentable) {
+        this.renter = renter;
+        this.rentable = rentable;
+        this.rentDate = Instant.now();
     }
 }

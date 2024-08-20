@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.verify;
+package pl.org.akai.plury_rentalis_backend.user;
 
 public class UnknownUserException extends RuntimeException {
     public UnknownUserException(String message) {

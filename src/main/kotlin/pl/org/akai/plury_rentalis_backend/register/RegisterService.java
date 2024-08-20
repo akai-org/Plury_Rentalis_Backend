@@ -3,38 +3,37 @@ package pl.org.akai.plury_rentalis_backend.register;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.org.akai.plury_rentalis_backend.verify.User;
-import pl.org.akai.plury_rentalis_backend.verify.UserRepository;
-import pl.org.akai.plury_rentalis_backend.verify.VerifiableRent;
+import pl.org.akai.plury_rentalis_backend.authorize.AuthorizeService;
+import pl.org.akai.plury_rentalis_backend.user.User;
+import pl.org.akai.plury_rentalis_backend.user.UserDTO;
+import pl.org.akai.plury_rentalis_backend.user.UserRepository;
 
 @Service
 @AllArgsConstructor
 public class RegisterService {
     private UserRepository userRepo;
+    private final AuthorizeService authorizeService;
 
-    public ResponseEntity<?> registerNewUser(VerifiableRent<?> verifiable) {
-        if (userRepo.existsByEmail(verifiable.getEmail()))
+    public ResponseEntity<?> registerNewUser(UserDTO newUser) {
+        if (userRepo.existsByEmail(newUser.email()))
             return ResponseEntity.badRequest().body("User already exists");
 
         try {
-            var user = User.builder().email(verifiable.getEmail()).build();
+            var user = User.builder()
+                    .email(newUser.email())
+                    .name(newUser.name())
+                    .build();
+
             userRepo.save(user);
 
-            return ResponseEntity.ok().body(user);
+            return authorizeService.login(newUser.email());
 
         } catch (NullPointerException nullPointerException) {
             return ResponseEntity.badRequest().body("Email cannot be null");
         }
     }
 
-    public Boolean isVerified(VerifiableRent<?> verifiable) {
-        return userRepo.existsByEmail(verifiable.getEmail());
-    }
-    public Boolean isVerified(String email) {
-        return userRepo.existsByEmail(email);
-    }
-
-    public User getUser(String email) {
+    public User getUserByEmail(String email) {
         return userRepo.findByEmail(email);
     }
 

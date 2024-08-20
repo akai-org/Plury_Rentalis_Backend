@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.rent;
+package pl.org.akai.plury_rentalis_backend.rentable;
 
 public class RentableNotFoundException extends RuntimeException {
     public RentableNotFoundException(String message) {

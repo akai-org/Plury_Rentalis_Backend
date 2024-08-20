@@ -4,5 +4,4 @@ public enum RentableType {
     Car,
     Camera,
     Transmitter,
-    Drone
 }

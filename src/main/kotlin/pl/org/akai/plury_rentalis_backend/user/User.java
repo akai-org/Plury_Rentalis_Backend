@@ -1,4 +1,4 @@
-package pl.org.akai.plury_rentalis_backend.verify;
+package pl.org.akai.plury_rentalis_backend.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,10 +20,13 @@ import lombok.Setter;
 @Builder
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String uuid;
 
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     @NonNull
     private String email;
+
+    @Column
+    private String name;
 }

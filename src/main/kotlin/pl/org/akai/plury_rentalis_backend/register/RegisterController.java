@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.org.akai.plury_rentalis_backend.verify.VerifiableRent;
+import pl.org.akai.plury_rentalis_backend.user.UserDTO;
 
 @RestController
 @RequestMapping("/register")
@@ -15,8 +15,8 @@ public class RegisterController {
     private RegisterService registerService;
 
     @PostMapping
-    ResponseEntity<?> registerNewUser(@RequestBody VerifiableRent<?> verifiable) {
-        return registerService.registerNewUser(verifiable);
+    ResponseEntity<?> registerNewUser(@RequestBody UserDTO registeredUser) {
+        return registerService.registerNewUser(registeredUser);
     }
 
 }
