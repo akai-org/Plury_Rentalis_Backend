@@ -8,4 +8,8 @@ public class UnknownUserException extends RuntimeException {
     public UnknownUserException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public UnknownUserException() {
+        super("Unknown user");
+    }
 }

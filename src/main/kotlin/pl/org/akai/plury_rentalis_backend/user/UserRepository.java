@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 public interface UserRepository extends CrudRepository<User, String> {
 
     User findByEmail(String email);
-    Boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
     @Transactional(readOnly = true)
-    @Query("SELECT u FROM User u")
+    @Query("SELECT u FROM rentalis_user u")
     Stream<User> findAllAsStream();
 }

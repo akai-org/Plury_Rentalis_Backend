@@ -11,7 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.proxy.HibernateProxy;
+import pl.org.akai.plury_rentalis_backend.config.UUIDGenerator;
 
 import java.util.Objects;
 
@@ -20,9 +23,11 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class RentableObject {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "uuid")
+    @GenericGenerator(name = "uuid", type = UUIDGenerator.class)
     private String uuid;
 
     @Column

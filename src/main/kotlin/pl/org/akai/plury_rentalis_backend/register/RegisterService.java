@@ -32,9 +32,4 @@ public class RegisterService {
             return ResponseEntity.badRequest().body("Email cannot be null");
         }
     }
-
-    public User getUserByEmail(String email) {
-        return userRepo.findByEmail(email);
-    }
-
 }

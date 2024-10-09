@@ -2,6 +2,7 @@ package pl.org.akai.plury_rentalis_backend.authorize;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +18,13 @@ public class AuthorizeController {
         this.authorizeService = authorizeService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> login(@RequestBody String email) {
-        return authorizeService.login(email);
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> authorizeByEmail(@RequestBody EmailHolder email) {
+        return authorizeService.login(email.getEmail());
     }
 
-
+    @GetMapping
+    public ResponseEntity<?> test() {
+        return ResponseEntity.ok().body("{\"message\": \"Request test was successful\"}");
+    }
 }
